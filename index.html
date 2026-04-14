@@ -433,4 +433,12 @@ function handleSubmit(e) {
 }
 
 function toggleEglise(select) {
-  document.getElementById('eg
+  document.getElementById('eglise-detail').style.display = select.value === 'oui' ? 'block' : 'none';
+}
+
+function toggleAutre(select) {
+  document.getElementById('source-autre-detail').style.display = select.value === 'autre' ? 'block' : 'none';
+}
+</script>
+</body>
+</html>
