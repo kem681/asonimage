@@ -129,8 +129,8 @@ footer a { color:var(--gold); text-decoration:none; }
   section { padding:4rem 1.5rem; }
 }
 
-.reveal { opacity:0; transform:translateY(30px); transition:all .8s ease; }
-.reveal.visible { opacity:1; transform:translateY(0); }
+.js-loaded .reveal { opacity:0; transform:translateY(30px); transition:all .8s ease; }
+.js-loaded .reveal.visible { opacity:1; transform:translateY(0); }
 </style>
 </head>
 <body>
@@ -364,11 +364,16 @@ footer a { color:var(--gold); text-decoration:none; }
 </footer>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+document.documentElement.classList.add('js-loaded');
+
 const reveals = document.querySelectorAll('.reveal');
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
-}, { threshold: 0.15 });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 reveals.forEach(el => observer.observe(el));
+
+// Fallback: make everything visible after 3s in case observer fails
+setTimeout(() => { reveals.forEach(el => el.classList.add('visible')); }, 3000);
 
 function handleSubmit(e) {
   e.preventDefault();
