@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>À Son Image — Séminaire 2026</title>
+<title>À Son Image — Séminaire 2025</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -138,18 +138,18 @@ footer a { color:var(--gold); text-decoration:none; }
 <section class="hero">
   <div class="hero-ornament"></div>
   <div class="hero-content">
-    <p class="hero-tag">Séminaire · Plateau ardéchois, France · Août 2026</p>
+    <p class="hero-tag">Séminaire · Plateau du Vercors, France · Août 2025</p>
     <h1 class="hero-title">À Son <em>Image</em></h1>
     <p class="hero-subtitle">Un séminaire de 5 jours pour redécouvrir le masculin et le féminin à la lumière de la Bible. Un espace de vérité et une invitation à s'émerveiller.</p>
     <p class="hero-partner">Dans le cadre d'EFF</p>
     <div class="hero-details">
-      <div class="hero-detail">Dates<strong>1 – 6 août 2026</strong></div>
+      <div class="hero-detail">Dates<strong>1 – 6 août 2025</strong></div>
       <div class="hero-detail">Public<strong>Jeunes adultes · 20-30 ans</strong></div>
       <div class="hero-detail">Places<strong>30 participants</strong></div>
     </div>
     <div class="hero-cta"><a href="#inscription">S'inscrire</a></div>
   </div>
-  
+  <div class="scroll-hint"><span>Découvrir</span><div class="scroll-line"></div></div>
 </section>
 
 <section class="vision">
@@ -302,7 +302,7 @@ footer a { color:var(--gold); text-decoration:none; }
         <div>
           <label for="source">Comment as-tu entendu parler de ce séminaire ? *</label>
           <select id="source" name="source" required onchange="toggleAutre(this)">
-            <option value="">S��lectionner</option><option value="ami">Par un ami</option><option value="eglise">Par mon église</option><option value="reseaux">Réseaux sociaux</option><option value="eff">Site EFF</option><option value="autre">Autre</option>
+            <option value="">S��lectionner</option><option value="ami">Par un ami</option><option value="eglise">Par mon église</option><option value="reseaux">Réseaux sociaux</option><option value="eff">Site EFF / Repère</option><option value="autre">Autre</option>
           </select>
         </div>
       </div>
@@ -410,7 +410,7 @@ function handleSubmit(e) {
     autres_questions: form['autres-questions'].value
   };
 
-  fetch('inscription.php', {
+  fetch('https://n8n.kemar.me/webhook/asi-inscription', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
