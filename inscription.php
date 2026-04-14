@@ -1,205 +1,132 @@
 <?php
-// ============================================
-// À Son Image — Backend inscription
-// Envoie les données du formulaire par email
-// ============================================
-
-// Configuration
-$destinataire = "contact@asonimage.ch";
-$sujet_admin  = "Nouvelle inscription — À Son Image";
-
-// Autoriser les requêtes depuis le frontend
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST");
-header("Access-Control-Allow-Headers: Content-Type");
-header("Content-Type: application/json; charset=utf-8");
-
-// Gérer le preflight CORS
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
+if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+    require __DIR__ . '/vendor/autoload.php';
+    $usePhpMailer = true;
+} else {
+    $usePhpMailer = false;
 }
 
-// Vérifier la méthode
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit(); }
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    echo json_encode(["error" => "Méthode non autorisée"]);
-    exit;
+    echo json_encode(['success' => false, 'error' => 'Methode non autorisee']);
+    exit();
 }
 
-// Récupérer les données
-$data = json_decode(file_get_contents("php://input"), true);
+$input = json_decode(file_get_contents('php://input'), true);
+if (!$input) { $input = $_POST; }
 
-if (!$data) {
-    http_response_code(400);
-    echo json_encode(["error" => "Données invalides"]);
-    exit;
-}
+function clean($val) { return htmlspecialchars(strip_tags(trim($val ?? ''))); }
 
-// Champs attendus
-$prenom       = htmlspecialchars($data['prenom'] ?? '');
-$nom          = htmlspecialchars($data['nom'] ?? '');
-$email        = filter_var($data['email'] ?? '', FILTER_SANITIZE_EMAIL);
-$tel          = htmlspecialchars($data['tel'] ?? 'Non renseigné');
-$dob          = htmlspecialchars($data['dob'] ?? '');
-$ville        = htmlspecialchars($data['ville'] ?? '');
-$eglise_yn    = htmlspecialchars($data['eglise_yn'] ?? '');
-$eglise       = htmlspecialchars($data['eglise'] ?? 'Non précisé');
-$source       = htmlspecialchars($data['source'] ?? '');
-$source_autre = htmlspecialchars($data['source_autre'] ?? '');
-$logement     = htmlspecialchars($data['logement'] ?? 'Non précisé');
-$allergies    = htmlspecialchars($data['allergies'] ?? 'Aucune');
-$accessibilite = htmlspecialchars($data['accessibilite'] ?? 'Aucun');
-$question     = htmlspecialchars($data['question_camp'] ?? 'Pas de question');
-$autres       = htmlspecialchars($data['autres_questions'] ?? 'Rien à signaler');
+$prenom           = clean($input['prenom'] ?? '');
+$nom              = clean($input['nom'] ?? '');
+$email            = filter_var(trim($input['email'] ?? ''), FILTER_SANITIZE_EMAIL);
+$tel              = clean($input['tel'] ?? '');
+$dob              = clean($input['dob'] ?? '');
+$ville            = clean($input['ville'] ?? '');
+$eglise_yn        = clean($input['eglise_yn'] ?? '');
+$eglise           = clean($input['eglise'] ?? '');
+$source           = clean($input['source'] ?? '');
+$source_autre     = clean($input['source_autre'] ?? '');
+$logement         = clean($input['logement'] ?? '');
+$allergies        = clean($input['allergies'] ?? '');
+$accessibilite    = clean($input['accessibilite'] ?? '');
+$question_camp    = clean($input['question_camp'] ?? '');
+$autres_questions = clean($input['autres_questions'] ?? '');
 
-// Validation minimale
 if (empty($prenom) || empty($nom) || empty($email) || empty($dob)) {
     http_response_code(400);
-    echo json_encode(["error" => "Champs obligatoires manquants"]);
-    exit;
+    echo json_encode(['success' => false, 'error' => 'Champs obligatoires manquants']);
+    exit();
 }
-
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     http_response_code(400);
-    echo json_encode(["error" => "Email invalide"]);
-    exit;
+    echo json_encode(['success' => false, 'error' => 'Email invalide']);
+    exit();
 }
 
-// Source complète
-$source_txt = $source;
-if ($source === 'autre' && !empty($source_autre)) {
-    $source_txt = "Autre : " . $source_autre;
+define('SMTP_HOST', 'mail.infomaniak.com');
+define('SMTP_PORT', 587);
+define('SMTP_USER', 'contact@asonimage.ch');
+define('SMTP_PASS', 'WTo&s6CC%C0*&24');
+define('ADMIN_EMAIL', 'contact@asonimage.ch');
+
+$eglise_line  = ($eglise_yn === 'oui' && $eglise) ? $eglise : ($eglise_yn === 'non' ? 'Non' : $eglise_yn);
+$source_label = ($source === 'autre') ? $source_autre : $source;
+
+$admin_body  = "Nouvelle inscription - A Son Image\n";
+$admin_body .= str_repeat("=", 40) . "\n\n";
+$admin_body .= "Prenom        : {$prenom}\n";
+$admin_body .= "Nom           : {$nom}\n";
+$admin_body .= "Email         : {$email}\n";
+$admin_body .= "Telephone     : {$tel}\n";
+$admin_body .= "Naissance     : {$dob}\n";
+$admin_body .= "Ville/Region  : {$ville}\n";
+$admin_body .= "Eglise        : {$eglise_line}\n";
+$admin_body .= "Source        : {$source_label}\n";
+$admin_body .= "Logement      : {$logement}\n";
+$admin_body .= "Allergies     : {$allergies}\n";
+$admin_body .= "Accessibilite : {$accessibilite}\n";
+$admin_body .= "Question camp : {$question_camp}\n";
+$admin_body .= "Autres        : {$autres_questions}\n";
+$admin_body .= "\nDate : " . date('d/m/Y H:i') . "\n";
+
+$confirm_body  = "Bonjour {$prenom},\n\n";
+$confirm_body .= "Merci pour ton inscription au seminaire A Son Image (1-6 aout 2025).\n\n";
+$confirm_body .= "Nous avons bien recu ta demande et tu recevras une confirmation d'ici quelques jours avec toutes les informations pratiques.\n\n";
+$confirm_body .= "N'hesite pas a nous ecrire a contact@asonimage.ch si tu as des questions.\n\n";
+$confirm_body .= "A bientot !\nL'equipe A Son Image\n";
+
+function sendViaSMTP($to, $toName, $subject, $body) {
+    $mail = new PHPMailer(true);
+    $mail->isSMTP();
+    $mail->Host       = SMTP_HOST;
+    $mail->SMTPAuth   = true;
+    $mail->Username   = SMTP_USER;
+    $mail->Password   = SMTP_PASS;
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    $mail->Port       = SMTP_PORT;
+    $mail->CharSet    = 'UTF-8';
+    $mail->setFrom(SMTP_USER, 'A Son Image');
+    $mail->addAddress($to, $toName);
+    $mail->Subject = $subject;
+    $mail->Body    = $body;
+    $mail->isHTML(false);
+    $mail->send();
 }
 
-// ============================================
-// Email pour l'équipe
-// ============================================
-$message_admin = "
-══════════════════════════════════════
-  NOUVELLE INSCRIPTION — À SON IMAGE
-══════════════════════════════════════
-
-INFORMATIONS DE BASE
-─────────────────────
-Prénom :           $prenom
-Nom :              $nom
-Email :            $email
-Téléphone :        $tel
-Date de naissance : $dob
-
-CONTEXTE
-─────────────────────
-Ville / Région :   $ville
-Église :           $eglise_yn" . ($eglise_yn === 'oui' ? " — $eglise" : "") . "
-Source :           $source_txt
-
-BESOINS PRATIQUES
-─────────────────────
-Logement :         $logement
-Allergies :        $allergies
-Accessibilité :    $accessibilite
-
-CE QUI L'AMÈNE
-─────────────────────
-$question
-
-AUTRES QUESTIONS
-─────────────────────
-$autres
-
-══════════════════════════════════════
-";
-
-$headers_admin   = [];
-$headers_admin[] = "From: À Son Image <noreply@asonimage.ch>";
-$headers_admin[] = "Reply-To: $email";
-$headers_admin[] = "Content-Type: text/plain; charset=UTF-8";
-
-$envoi_admin = mail(
-    $destinataire,
-    "=?UTF-8?B?" . base64_encode($sujet_admin . " — $prenom $nom") . "?=",
-    $message_admin,
-    implode("\r\n", $headers_admin)
-);
-
-// ============================================
-// Email de confirmation pour le campeur
-// ============================================
-$sujet_campeur = "Inscription reçue — À Son Image";
-
-$message_campeur = "
-Salut $prenom !
-
-Merci pour ton inscription au séminaire À Son Image (1-6 août 2025, Plateau du Vercors).
-
-Nous avons bien reçu ta demande. Tu recevras un email de confirmation définitive d'ici quelques jours avec toutes les informations pratiques.
-
-D'ici là, n'hésite pas à nous écrire si tu as des questions : contact@asonimage.ch
-
-À très bientôt !
-L'équipe À Son Image
-";
-
-$headers_campeur   = [];
-$headers_campeur[] = "From: À Son Image <contact@asonimage.ch>";
-$headers_campeur[] = "Reply-To: contact@asonimage.ch";
-$headers_campeur[] = "Content-Type: text/plain; charset=UTF-8";
-
-$envoi_campeur = mail(
-    $email,
-    "=?UTF-8?B?" . base64_encode($sujet_campeur) . "?=",
-    $message_campeur,
-    implode("\r\n", $headers_campeur)
-);
-
-// ============================================
-// Sauvegarder en CSV (backup local)
-// ============================================
-$csv_file = __DIR__ . '/inscriptions.csv';
+// Backup CSV
+$csv_file   = __DIR__ . '/inscriptions.csv';
 $csv_exists = file_exists($csv_file);
-
-$csv_row = [
-    date('Y-m-d H:i:s'),
-    $prenom,
-    $nom,
-    $email,
-    $tel,
-    $dob,
-    $ville,
-    $eglise_yn,
-    $eglise,
-    $source_txt,
-    $logement,
-    $allergies,
-    $accessibilite,
-    $question,
-    $autres
-];
-
 $fp = fopen($csv_file, 'a');
-if (!$csv_exists) {
-    fputcsv($fp, [
-        'Date inscription', 'Prénom', 'Nom', 'Email', 'Téléphone',
-        'Date naissance', 'Ville', 'Église (O/N)', 'Église (nom)',
-        'Source', 'Logement', 'Allergies', 'Accessibilité', 'Question', 'Autres'
-    ]);
+if ($fp) {
+    if (!$csv_exists) {
+        fputcsv($fp, ['Date','Prenom','Nom','Email','Tel','Naissance','Ville','Eglise','Source','Logement','Allergies','Accessibilite','Question','Autres']);
+    }
+    fputcsv($fp, [date('d/m/Y H:i'), $prenom, $nom, $email, $tel, $dob, $ville, $eglise_line, $source_label, $logement, $allergies, $accessibilite, $question_camp, $autres_questions]);
+    fclose($fp);
 }
-fputcsv($fp, $csv_row);
-fclose($fp);
 
-// ============================================
-// Réponse
-// ============================================
-if ($envoi_admin) {
-    http_response_code(200);
-    echo json_encode([
-        "success" => true,
-        "message" => "Inscription enregistrée"
-    ]);
-} else {
+try {
+    if ($usePhpMailer) {
+        sendViaSMTP(ADMIN_EMAIL, 'Equipe ASI', 'Nouvelle inscription - ' . $prenom . ' ' . $nom, $admin_body);
+        sendViaSMTP($email, $prenom . ' ' . $nom, 'Confirmation inscription - A Son Image', $confirm_body);
+    } else {
+        $headers = "From: contact@asonimage.ch\r\nReply-To: contact@asonimage.ch\r\nContent-Type: text/plain; charset=UTF-8\r\n";
+        mail(ADMIN_EMAIL, '=?UTF-8?B?' . base64_encode('Nouvelle inscription - ' . $prenom . ' ' . $nom) . '?=', $admin_body, $headers);
+        mail($email, '=?UTF-8?B?' . base64_encode('Confirmation inscription - A Son Image') . '?=', $confirm_body, $headers);
+    }
+    echo json_encode(['success' => true]);
+} catch (Exception $e) {
     http_response_code(500);
-    echo json_encode([
-        "error" => "Erreur lors de l'envoi. Contacte-nous directement à contact@asonimage.ch"
-    ]);
+    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
 }
+?>
