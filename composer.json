@@ -1,0 +1,6 @@
+{
+  "name": "asonimage/landing",
+  "require": {
+    "phpmailer/phpmailer": "^6.9"
+  }
+}
