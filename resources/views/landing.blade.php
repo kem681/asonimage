@@ -409,7 +409,7 @@ function handleSubmit(e) {
     autres_questions: form['autres-questions'].value
   };
 
-  fetch('https://n8n.kemar.me/webhook/asi-inscription', {
+  fetch('{{ route('inscription.store') }}', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
