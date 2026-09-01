@@ -29,6 +29,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 .site-nav nav { display: flex; gap: 1.8rem; }
 .site-nav a { color: rgba(245,240,232,0.8); text-decoration: none; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; transition: color .2s ease; }
 .site-nav a:hover { color: var(--gold); }
+.site-nav-label { color: var(--gold); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.9; padding-right: 0.4rem; border-right: 1px solid rgba(245,240,232,0.25); }
 @media (max-width:768px) { .site-nav { padding: 1.2rem 1.5rem; } .site-nav nav { gap: 1rem; } }
 
 .hero {
@@ -123,6 +124,15 @@ section { padding:6rem 2rem; }
 .btn-submit { display:inline-block; padding:1.1rem 4rem; background:var(--forest); color:var(--cream); border:none; font-family:'DM Sans',sans-serif; font-size:0.85rem; font-weight:600; letter-spacing:0.18em; text-transform:uppercase; cursor:pointer; transition:all .4s ease; margin-top:1rem; }
 .btn-submit:hover { background:var(--ink); transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,0,0,0.12); }
 
+.espace-membre { background:var(--forest); color:var(--cream); text-align:center; position:relative; overflow:hidden; }
+.espace-membre::before { content:''; position:absolute; inset:0; background:url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E"); pointer-events:none; }
+.espace-membre .section-label { color:var(--gold); }
+.espace-membre .section-title { color:var(--cream); }
+.espace-membre .section-title em { color:var(--gold); }
+.espace-membre-desc { position:relative; font-size:1.05rem; line-height:1.9; color:rgba(245,240,232,0.75); font-weight:300; max-width:560px; margin:0 auto 2.2rem; }
+.espace-membre-cta { position:relative; display:inline-block; padding:1rem 3rem; background:var(--gold); color:var(--forest); font-size:0.85rem; font-weight:600; letter-spacing:0.15em; text-transform:uppercase; text-decoration:none; transition:all .4s ease; }
+.espace-membre-cta:hover { background:var(--gold-light); transform:translateY(-2px); box-shadow:0 8px 30px rgba(196,163,90,0.25); }
+
 footer { background:var(--ink); color:rgba(245,240,232,0.4); padding:3rem 2rem; text-align:center; font-size:0.8rem; letter-spacing:0.05em; }
 footer a { color:var(--gold); text-decoration:none; }
 
@@ -146,6 +156,7 @@ footer a { color:var(--gold); text-decoration:none; }
     @auth
       <a href="{{ route('membres.index') }}">Espace membre</a>
     @else
+      <span class="site-nav-label">Espace membre</span>
       <a href="{{ route('login') }}">Connexion</a>
       <a href="{{ route('register') }}">Créer un compte</a>
     @endauth
@@ -381,6 +392,19 @@ footer a { color:var(--gold); text-decoration:none; }
       <p style="font-family:'Cormorant Garamond',serif; font-size:1.4rem; color:var(--forest);">Merci !</p>
       <p style="font-size:0.92rem; color:var(--ink-soft); margin-top:0.5rem; font-weight:300;">Ton inscription a bien été enregistrée. Tu recevras un email de confirmation d'ici quelques jours avec les informations pratiques. Si tu as une question d'ici là, écris-nous à <a href="mailto:contact@asonimage.ch" style="color:var(--forest);">contact@asonimage.ch</a></p>
     </div>
+  </div>
+</section>
+
+<section class="espace-membre" id="espace-membre">
+  <div class="container reveal">
+    <p class="section-label">Déjà inscrit·e ?</p>
+    <h2 class="section-title">Accède à l'<em>espace membre</em></h2>
+    <p class="espace-membre-desc">Retrouve les PowerPoints et les audios des plénières après le séminaire, en te connectant avec l'email que tu as utilisé pour t'inscrire.</p>
+    @auth
+      <a href="{{ route('membres.index') }}" class="espace-membre-cta">Voir les ressources</a>
+    @else
+      <a href="{{ route('login') }}" class="espace-membre-cta">Se connecter</a>
+    @endauth
   </div>
 </section>
 
