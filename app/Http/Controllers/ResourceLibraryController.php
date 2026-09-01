@@ -6,7 +6,8 @@ use App\Models\Edition;
 use App\Models\Resource;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class ResourceLibraryController extends Controller
 {
@@ -48,12 +49,18 @@ class ResourceLibraryController extends Controller
         return view('membres.ressource', ['resource' => $resource]);
     }
 
-    public function stream(Resource $resource): StreamedResponse
+    public function stream(Resource $resource): BinaryFileResponse
     {
         abort_unless(Storage::disk('public')->exists($resource->file_path), 404);
 
         // Servi en "inline" (jamais "attachment") : le fichier s'ouvre dans le
         // navigateur pour consultation, il ne se telecharge pas directement.
-        return Storage::disk('public')->response($resource->file_path, $resource->original_filename);
+        // BinaryFileResponse (plutot qu'un StreamedResponse) gere nativement
+        // les requetes "Range", necessaires pour le seek audio et un
+        // chargement progressif cote pdf.js sur les gros fichiers.
+        $response = new BinaryFileResponse(Storage::disk('public')->path($resource->file_path));
+        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_INLINE, $resource->original_filename);
+
+        return $response;
     }
 }
