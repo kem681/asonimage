@@ -63,14 +63,14 @@ class AdminTest extends TestCase
         $this->assertDatabaseCount('authorized_emails', 1);
     }
 
-    public function test_un_admin_peut_publier_une_ressource_et_un_membre_peut_la_telecharger(): void
+    public function test_un_admin_peut_publier_un_pdf_et_un_membre_le_consulte_en_ligne_sans_le_telecharger(): void
     {
         Storage::fake('public');
 
         $admin = User::factory()->create(['is_admin' => true]);
         $edition = Edition::create(['year' => 2026, 'label' => 'Edition 2026']);
 
-        $file = UploadedFile::fake()->create('plan-jour-1.pptx', 500);
+        $file = UploadedFile::fake()->create('plan-jour-1.pdf', 500, 'application/pdf');
 
         $store = $this->actingAs($admin)->post('/admin/ressources', [
             'title' => 'Plan detaille jour 1',
@@ -83,10 +83,60 @@ class AdminTest extends TestCase
         $store->assertRedirect(route('admin.resources.index'));
         $resource = Resource::firstOrFail();
         Storage::disk('public')->assertExists($resource->file_path);
+        $this->assertFalse($resource->isAudio());
 
         $member = User::factory()->create(['is_admin' => false]);
-        $download = $this->actingAs($member)->get(route('membres.ressources.telecharger', $resource));
 
-        $download->assertOk();
+        $viewer = $this->actingAs($member)->get(route('membres.ressources.show', $resource));
+        $viewer->assertOk();
+
+        $stream = $this->actingAs($member)->get(route('membres.ressources.fichier', $resource));
+        $stream->assertOk();
+        $stream->assertHeader('content-disposition');
+        $this->assertStringStartsWith('inline', $stream->headers->get('content-disposition'));
+    }
+
+    public function test_un_admin_peut_publier_un_audio_et_un_membre_peut_l_ecouter(): void
+    {
+        Storage::fake('public');
+
+        $admin = User::factory()->create(['is_admin' => true]);
+        $edition = Edition::create(['year' => 2026, 'label' => 'Edition 2026']);
+
+        $file = UploadedFile::fake()->create('plenieres-jour-2.mp3', 2000, 'audio/mpeg');
+
+        $store = $this->actingAs($admin)->post('/admin/ressources', [
+            'title' => 'Plénière jour 2',
+            'edition_id' => $edition->id,
+            'day' => 2,
+            'file' => $file,
+        ]);
+
+        $store->assertRedirect(route('admin.resources.index'));
+        $resource = Resource::firstOrFail();
+        $this->assertTrue($resource->isAudio());
+
+        $member = User::factory()->create(['is_admin' => false]);
+        $viewer = $this->actingAs($member)->get(route('membres.ressources.show', $resource));
+        $viewer->assertOk();
+        $viewer->assertSee('audio', false);
+    }
+
+    public function test_un_fichier_powerpoint_est_refuse(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+        $edition = Edition::create(['year' => 2026, 'label' => 'Edition 2026']);
+
+        $file = UploadedFile::fake()->create('plan.pptx', 500);
+
+        $response = $this->actingAs($admin)->post('/admin/ressources', [
+            'title' => 'Plan',
+            'edition_id' => $edition->id,
+            'day' => 1,
+            'file' => $file,
+        ]);
+
+        $response->assertSessionHasErrors('file');
+        $this->assertDatabaseCount('resources', 0);
     }
 }

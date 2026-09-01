@@ -43,10 +43,17 @@ class ResourceLibraryController extends Controller
         ]);
     }
 
-    public function download(Resource $resource): StreamedResponse
+    public function show(Resource $resource): View
+    {
+        return view('membres.ressource', ['resource' => $resource]);
+    }
+
+    public function stream(Resource $resource): StreamedResponse
     {
         abort_unless(Storage::disk('public')->exists($resource->file_path), 404);
 
-        return Storage::disk('public')->download($resource->file_path, $resource->original_filename);
+        // Servi en "inline" (jamais "attachment") : le fichier s'ouvre dans le
+        // navigateur pour consultation, il ne se telecharge pas directement.
+        return Storage::disk('public')->response($resource->file_path, $resource->original_filename);
     }
 }

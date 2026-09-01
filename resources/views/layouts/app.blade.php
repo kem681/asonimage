@@ -67,6 +67,11 @@ table.data th { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppe
 .resource-row a.download { color: var(--forest); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.05em; text-transform: uppercase; text-decoration: none; white-space: nowrap; margin-left: 1.5rem; }
 .resource-row a.download:hover { color: var(--gold); }
 
+.pdf-viewer { border: 1px solid var(--sand-dark); background: var(--cream); height: 80vh; }
+.pdf-viewer iframe { width: 100%; height: 100%; border: none; }
+
+audio { accent-color: var(--forest); }
+
 footer { text-align: center; padding: 2rem; font-size: 0.75rem; color: var(--ink-soft); }
 </style>
 </head>

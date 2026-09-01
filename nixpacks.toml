@@ -7,4 +7,4 @@ cmds = [
 ]
 
 [start]
-cmd = "php artisan migrate --force && php artisan db:seed --class=EditionSeeder --force && php artisan db:seed --class=AdminSeeder --force && php artisan serve --host=0.0.0.0 --port=80"
+cmd = "php artisan migrate --force && php artisan db:seed --class=EditionSeeder --force && php artisan db:seed --class=AdminSeeder --force && php -d upload_max_filesize=520M -d post_max_size=520M -d memory_limit=256M -d max_execution_time=300 -S 0.0.0.0:80 -t public vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php"

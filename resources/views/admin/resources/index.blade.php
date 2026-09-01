@@ -10,7 +10,7 @@
 
     <table class="data">
         <thead>
-            <tr><th>Titre</th><th>Édition</th><th>Jour</th><th>Fichier</th><th>Publié le</th></tr>
+            <tr><th>Titre</th><th>Édition</th><th>Jour</th><th>Type</th><th>Fichier</th><th>Publié le</th></tr>
         </thead>
         <tbody>
             @foreach($resources as $resource)
@@ -18,6 +18,7 @@
                     <td>{{ $resource->title }}</td>
                     <td>{{ $resource->edition->label ?? '—' }}</td>
                     <td>J{{ $resource->day }}</td>
+                    <td>{{ $resource->isAudio() ? 'Audio' : 'Document' }}</td>
                     <td>{{ $resource->original_filename }}</td>
                     <td>{{ $resource->created_at->format('d/m/Y') }}</td>
                 </tr>

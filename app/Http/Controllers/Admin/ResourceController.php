@@ -34,7 +34,7 @@ class ResourceController extends Controller
             'description' => ['nullable', 'string', 'max:2000'],
             'edition_id' => ['required', 'exists:editions,id'],
             'day' => ['required', 'integer', 'between:1,5'],
-            'file' => ['required', 'file', 'mimes:ppt,pptx,pdf', 'max:102400'],
+            'file' => ['required', 'file', 'mimes:pdf,mp3,wav,ogg,m4a', 'max:512000'],
         ]);
 
         $file = $request->file('file');

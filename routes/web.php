@@ -25,7 +25,8 @@ Route::middleware('auth')->prefix('membres')->name('membres.')->group(function (
     Route::get('/', [ResourceLibraryController::class, 'index'])->name('index');
     Route::get('/{edition}', [ResourceLibraryController::class, 'showEdition'])->name('edition');
     Route::get('/{edition}/jour/{day}', [ResourceLibraryController::class, 'showDay'])->name('jour');
-    Route::get('/ressources/{resource}/telecharger', [ResourceLibraryController::class, 'download'])->name('ressources.telecharger');
+    Route::get('/ressources/{resource}', [ResourceLibraryController::class, 'show'])->name('ressources.show');
+    Route::get('/ressources/{resource}/fichier', [ResourceLibraryController::class, 'stream'])->name('ressources.fichier');
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {

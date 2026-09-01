@@ -17,7 +17,7 @@
                         <div class="desc">{{ $resource->description }}</div>
                     @endif
                 </div>
-                <a class="download" href="{{ route('membres.ressources.telecharger', $resource) }}">Télécharger</a>
+                <a class="download" href="{{ route('membres.ressources.show', $resource) }}">{{ $resource->isAudio() ? 'Écouter' : 'Consulter' }}</a>
             </div>
         @endforeach
     @endif

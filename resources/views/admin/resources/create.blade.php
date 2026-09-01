@@ -33,8 +33,9 @@
             </select>
         </div>
         <div>
-            <label for="file">Fichier (PowerPoint ou PDF)</label>
-            <input type="file" id="file" name="file" accept=".ppt,.pptx,.pdf" required>
+            <label for="file">Fichier (PDF ou audio)</label>
+            <p class="card-meta" style="margin-bottom:0.4rem;">Les PowerPoints doivent être exportés en PDF avant l'envoi (ils ne sont pas consultables en ligne autrement). Audio : mp3, wav, ogg ou m4a.</p>
+            <input type="file" id="file" name="file" accept=".pdf,.mp3,.wav,.ogg,.m4a" required>
         </div>
         <button type="submit" class="btn">Publier</button>
     </form>
