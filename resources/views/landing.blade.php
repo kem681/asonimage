@@ -25,6 +25,12 @@
 html { scroll-behavior: smooth; }
 body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); overflow-x: hidden; }
 
+.site-nav { position: absolute; top: 0; left: 0; right: 0; z-index: 20; display: flex; justify-content: flex-end; padding: 1.6rem 2rem; }
+.site-nav nav { display: flex; gap: 1.8rem; }
+.site-nav a { color: rgba(245,240,232,0.8); text-decoration: none; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; transition: color .2s ease; }
+.site-nav a:hover { color: var(--gold); }
+@media (max-width:768px) { .site-nav { padding: 1.2rem 1.5rem; } .site-nav nav { gap: 1rem; } }
+
 .hero {
   min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
   text-align: center; position: relative; overflow: hidden; padding: 2rem;
@@ -134,6 +140,17 @@ footer a { color:var(--gold); text-decoration:none; }
 </style>
 </head>
 <body>
+
+<header class="site-nav">
+  <nav>
+    @auth
+      <a href="{{ route('membres.index') }}">Espace membre</a>
+    @else
+      <a href="{{ route('login') }}">Connexion</a>
+      <a href="{{ route('register') }}">Créer un compte</a>
+    @endauth
+  </nav>
+</header>
 
 <section class="hero">
   <div class="hero-ornament"></div>
