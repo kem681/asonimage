@@ -67,8 +67,10 @@ table.data th { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppe
 .resource-row a.download { color: var(--forest); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.05em; text-transform: uppercase; text-decoration: none; white-space: nowrap; margin-left: 1.5rem; }
 .resource-row a.download:hover { color: var(--gold); }
 
-.pdf-viewer { border: 1px solid var(--sand-dark); background: var(--cream); height: 80vh; }
-.pdf-viewer iframe { width: 100%; height: 100%; border: none; }
+.pdf-viewer { border: 1px solid var(--sand-dark); background: var(--sand); height: 80vh; overflow-y: auto; padding: 1rem; }
+.pdf-viewer .pdf-page { display: block; width: 100%; height: auto; margin: 0 auto 0.8rem; box-shadow: 0 4px 16px rgba(0,0,0,0.08); user-select: none; -webkit-user-select: none; }
+.pdf-viewer .pdf-page:last-child { margin-bottom: 0; }
+.pdf-viewer .pdf-loading { text-align: center; color: var(--ink-soft); font-size: 0.9rem; padding: 2rem; }
 
 audio { accent-color: var(--forest); }
 
