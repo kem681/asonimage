@@ -7,4 +7,4 @@ cmds = [
 ]
 
 [start]
-cmd = "php artisan migrate --force && php artisan db:seed --class=EditionSeeder --force && php artisan serve --host=0.0.0.0 --port=80"
+cmd = "php artisan migrate --force && php artisan db:seed --class=EditionSeeder --force && php artisan db:seed --class=AdminSeeder --force && php artisan serve --host=0.0.0.0 --port=80"
