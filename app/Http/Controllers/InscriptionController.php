@@ -92,16 +92,16 @@ class InscriptionController extends Controller
     private function sendParticipantConfirmation(array $data): void
     {
         $body = "Bonjour {$data['prenom']},\n\n"
-            ."Merci beaucoup pour ton inscription au seminaire A Son Image !\n\n"
-            ."On se rejouit de t'accueillir du dimanche 2 au vendredi 7 aout 2026 a la Salle de Saint Romain le desert, sur le plateau ardechois.\n\n"
-            ."Ton inscription a bien ete enregistree. Tu recevras d'ici quelques jours un email avec toutes les informations pratiques (acces, logement, programme detaille).\n\n"
-            ."En attendant, si tu as la moindre question, n'hesite pas a nous ecrire a contact@asonimage.ch - on est la !\n\n"
-            ."On a hate de vivre cette semaine avec toi.\n\n"
-            ."Chaleureusement,\nL'equipe A Son Image\nCecile, Val, Jonathan, Flo et Marc\n";
+            ."Merci beaucoup pour ton inscription au séminaire À Son Image !\n\n"
+            ."On se réjouit de t'accueillir du dimanche 2 au vendredi 7 août 2026 à la Salle de Saint Romain le désert, sur le plateau ardéchois.\n\n"
+            ."Ton inscription a bien été enregistrée. Tu recevras d'ici quelques jours un email avec toutes les informations pratiques (accès, logement, programme détaillé).\n\n"
+            ."En attendant, si tu as la moindre question, n'hésite pas à nous écrire à contact@asonimage.ch - on est là !\n\n"
+            ."On a hâte de vivre cette semaine avec toi.\n\n"
+            ."Chaleureusement,\nL'équipe À Son Image\nCécile, Val, Jonathan, Flo et Marc\n";
 
         Mail::raw($body, function ($message) use ($data) {
             $message->to($data['email'], $data['prenom'].' '.$data['nom'])
-                ->subject('Confirmation inscription - A Son Image');
+                ->subject('Confirmation inscription - À Son Image');
         });
     }
 }

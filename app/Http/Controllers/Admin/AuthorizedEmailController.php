@@ -37,7 +37,7 @@ class AuthorizedEmailController extends Controller
             ]
         );
 
-        return back()->with('status', "Email ajoute : {$data['email']}");
+        return back()->with('status', "Email ajouté : {$data['email']}");
     }
 
     public function import(Request $request, AuthorizedEmailCsvImporter $importer): RedirectResponse
@@ -50,6 +50,6 @@ class AuthorizedEmailController extends Controller
         $edition = Edition::findOrFail($data['edition_id']);
         $result = $importer->import($request->file('csv')->getRealPath(), $edition);
 
-        return back()->with('status', "Import termine : {$result['imported']} importes, {$result['skipped']} ignores.");
+        return back()->with('status', "Import terminé : {$result['imported']} importés, {$result['skipped']} ignorés.");
     }
 }

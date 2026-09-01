@@ -50,6 +50,6 @@ class ResourceController extends Controller
             'day' => $data['day'],
         ]);
 
-        return redirect()->route('admin.resources.index')->with('status', 'Ressource publiee.');
+        return redirect()->route('admin.resources.index')->with('status', 'Ressource publiée.');
     }
 }

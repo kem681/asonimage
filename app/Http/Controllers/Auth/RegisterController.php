@@ -37,7 +37,7 @@ class RegisterController extends Controller
 
         if (! $authorized) {
             return back()->withInput()->withErrors([
-                'email' => "Cet email n'est pas reconnu comme inscrit au seminaire. Si tu penses que c'est une erreur, ecris-nous a contact@asonimage.ch.",
+                'email' => "Cet email n'est pas reconnu comme inscrit au séminaire. Si tu penses que c'est une erreur, écris-nous à contact@asonimage.ch.",
             ]);
         }
 
