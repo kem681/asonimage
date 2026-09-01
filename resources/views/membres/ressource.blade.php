@@ -42,7 +42,15 @@
 
             const url = @json(route('membres.ressources.fichier', $resource));
 
-            pdfjsLib.getDocument({ url: url, withCredentials: true, disableRange: true, disableStream: true }).promise.then(function (pdf) {
+            const loadingTask = pdfjsLib.getDocument({ url: url, withCredentials: true });
+            loadingTask.onProgress = function (progress) {
+                if (progress.total) {
+                    const pct = Math.round((progress.loaded / progress.total) * 100);
+                    setMessage('Chargement du document… ' + pct + '%');
+                }
+            };
+
+            loadingTask.promise.then(function (pdf) {
                 container.textContent = '';
                 const renderPage = function (num) {
                     return pdf.getPage(num).then(function (page) {
