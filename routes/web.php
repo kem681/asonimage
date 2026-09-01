@@ -37,4 +37,5 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/ressources', [AdminResourceController::class, 'index'])->name('resources.index');
     Route::get('/ressources/nouvelle', [AdminResourceController::class, 'create'])->name('resources.create');
     Route::post('/ressources', [AdminResourceController::class, 'store'])->name('resources.store');
+    Route::delete('/ressources/{resource}', [AdminResourceController::class, 'destroy'])->name('resources.destroy');
 });

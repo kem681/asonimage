@@ -7,6 +7,7 @@ use App\Models\Edition;
 use App\Models\Resource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -51,5 +52,13 @@ class ResourceController extends Controller
         ]);
 
         return redirect()->route('admin.resources.index')->with('status', 'Ressource publiée.');
+    }
+
+    public function destroy(Resource $resource): RedirectResponse
+    {
+        Storage::disk('public')->delete($resource->file_path);
+        $resource->delete();
+
+        return redirect()->route('admin.resources.index')->with('status', 'Ressource supprimée.');
     }
 }
