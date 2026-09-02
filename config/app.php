@@ -82,6 +82,18 @@ return [
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Hotes dedies a l'outil 3x30
+    |--------------------------------------------------------------------------
+    |
+    | Sur ces noms d'hote (separes par des virgules), la racine du site
+    | redirige vers /3x30 au lieu d'afficher la landing page du seminaire.
+    |
+    */
+
+    'workshop_hosts' => env('WORKSHOP_HOSTS', 'app.asonimage.ch'),
+
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
     /*
