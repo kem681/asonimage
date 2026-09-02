@@ -84,9 +84,15 @@ footer { text-align: center; padding: 2rem; font-size: 0.75rem; color: var(--ink
     <nav>
         @auth
             <a href="{{ route('membres.index') }}">Ressources</a>
+            @if(auth()->user()->canAccessWorkshop())
+                <a href="{{ route('workshop.index') }}">3x30</a>
+            @endif
             @if(auth()->user()->is_admin)
                 <a href="{{ route('admin.resources.index') }}">Admin ressources</a>
                 <a href="{{ route('admin.emails.index') }}">Admin emails</a>
+                <a href="{{ route('admin.workshop.codes.index') }}">Admin 3x30</a>
+                <a href="{{ route('admin.workshop.participants.index') }}">Participants 3x30</a>
+                <a href="{{ route('admin.workshop.stats') }}">Chiffres 3x30</a>
             @endif
             <form method="POST" action="{{ route('logout') }}">
                 @csrf

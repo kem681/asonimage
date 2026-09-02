@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Services\Workshop\WorkshopContent;
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,7 +14,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(WorkshopContent::class, fn () => new WorkshopContent);
     }
 
     /**
@@ -19,6 +22,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Dates affichees en francais dans tout le module (ex. "lundi 2 septembre").
+        Carbon::setLocale('fr');
+        CarbonImmutable::setLocale('fr');
     }
 }

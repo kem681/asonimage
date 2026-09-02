@@ -30,7 +30,15 @@ class LoginController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('membres.index'));
+        $user = $request->user();
+
+        // Un participant 3x30 qui n'est pas membre du seminaire arrive
+        // directement sur l'outil ; les autres sur les ressources.
+        $default = ($user->isWorkshopParticipant() && ! $user->isSeminarMember())
+            ? route('workshop.index')
+            : route('membres.index');
+
+        return redirect()->intended($default);
     }
 
     public function destroy(Request $request): RedirectResponse
