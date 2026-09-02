@@ -85,7 +85,7 @@ class AdminTest extends TestCase
         Storage::disk('public')->assertExists($resource->file_path);
         $this->assertFalse($resource->isAudio());
 
-        $member = User::factory()->create(['is_admin' => false]);
+        $member = User::factory()->create(['is_admin' => false, 'edition_id' => $edition->id]);
 
         $viewer = $this->actingAs($member)->get(route('membres.ressources.show', $resource));
         $viewer->assertOk();
@@ -116,10 +116,55 @@ class AdminTest extends TestCase
         $resource = Resource::firstOrFail();
         $this->assertTrue($resource->isAudio());
 
-        $member = User::factory()->create(['is_admin' => false]);
+        $member = User::factory()->create(['is_admin' => false, 'edition_id' => $edition->id]);
         $viewer = $this->actingAs($member)->get(route('membres.ressources.show', $resource));
         $viewer->assertOk();
         $viewer->assertSee('audio', false);
+    }
+
+    public function test_un_membre_d_une_autre_edition_ne_peut_pas_consulter_une_ressource(): void
+    {
+        Storage::fake('public');
+
+        $admin = User::factory()->create(['is_admin' => true]);
+        $edition2026 = Edition::create(['year' => 2026, 'label' => 'Edition 2026']);
+        $edition2027 = Edition::create(['year' => 2027, 'label' => 'Edition 2027']);
+
+        $file = UploadedFile::fake()->create('plan-jour-1.pdf', 500, 'application/pdf');
+        $this->actingAs($admin)->post('/admin/ressources', [
+            'title' => 'Plan detaille jour 1',
+            'edition_id' => $edition2026->id,
+            'day' => 1,
+            'file' => $file,
+        ]);
+        $resource = Resource::firstOrFail();
+
+        $memberAutreEdition = User::factory()->create(['is_admin' => false, 'edition_id' => $edition2027->id]);
+
+        $this->actingAs($memberAutreEdition)->get(route('membres.ressources.show', $resource))->assertForbidden();
+        $this->actingAs($memberAutreEdition)->get(route('membres.edition', $edition2026))->assertForbidden();
+    }
+
+    public function test_une_ressource_commune_est_visible_par_tous_les_membres(): void
+    {
+        Storage::fake('public');
+
+        $admin = User::factory()->create(['is_admin' => true]);
+        $editionCommune = Edition::create(['year' => 0, 'label' => 'Ressources communes', 'is_common' => true]);
+        $edition2026 = Edition::create(['year' => 2026, 'label' => 'Edition 2026']);
+
+        $file = UploadedFile::fake()->create('video-commune.mp3', 500, 'audio/mpeg');
+        $this->actingAs($admin)->post('/admin/ressources', [
+            'title' => 'Ressource commune',
+            'edition_id' => $editionCommune->id,
+            'day' => 1,
+            'file' => $file,
+        ]);
+        $resource = Resource::firstOrFail();
+
+        $membre = User::factory()->create(['is_admin' => false, 'edition_id' => $edition2026->id]);
+
+        $this->actingAs($membre)->get(route('membres.ressources.show', $resource))->assertOk();
     }
 
     public function test_un_fichier_powerpoint_est_refuse(): void

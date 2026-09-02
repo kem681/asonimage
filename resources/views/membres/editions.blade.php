@@ -12,7 +12,7 @@
         <div class="card-grid">
             @foreach($editions as $edition)
                 <a href="{{ route('membres.edition', $edition) }}" class="card">
-                    <div class="card-eyebrow">Édition</div>
+                    <div class="card-eyebrow">{{ $edition->is_common ? 'Toutes éditions' : 'Édition' }}</div>
                     <div class="card-title">{{ $edition->label }}</div>
                     <div class="card-meta">{{ $edition->resources_count }} ressource{{ $edition->resources_count > 1 ? 's' : '' }}</div>
                 </a>

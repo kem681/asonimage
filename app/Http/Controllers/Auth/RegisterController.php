@@ -33,7 +33,7 @@ class RegisterController extends Controller
 
         $data = $validator->validated();
 
-        $authorized = AuthorizedEmail::where('email', strtolower($data['email']))->exists();
+        $authorized = AuthorizedEmail::where('email', strtolower($data['email']))->first();
 
         if (! $authorized) {
             return back()->withInput()->withErrors([
@@ -45,6 +45,7 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => strtolower($data['email']),
             'password' => Hash::make($data['password']),
+            'edition_id' => $authorized->edition_id,
         ]);
 
         Auth::login($user);
