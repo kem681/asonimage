@@ -34,7 +34,7 @@ class AdminLiveTest extends TestCase
         $session = LiveSession::first();
         $this->assertSame(4, strlen($session->code));
         $this->assertFalse($session->is_active);
-        $this->assertCount(7, $session->questions);
+        $this->assertCount(13, $session->questions);
 
         $this->actingAs($admin)->post("/sondage/{$session->id}/activer")->assertRedirect();
         $this->assertTrue($session->fresh()->is_active);
@@ -77,6 +77,7 @@ class AdminLiveTest extends TestCase
 
         $this->actingAs($admin)->get("/sondage/{$session->id}")->assertOk()
             ->assertSee('qui fixe les critères de beauté')
+            ->assertSee('Lequel des deux visages est beau')
             ->assertSee('Ma décision pour cette semaine')
             ->assertSee('Mettre en ligne')
             ->assertSee('Fermer')
@@ -105,7 +106,7 @@ class AdminLiveTest extends TestCase
         LiveAnswer::create(['live_question_id' => $q1->id, 'token' => str_repeat('a', 40), 'value' => 'instagram']);
 
         $this->actingAs($admin)->get("/sondage/{$session->id}/presenter")->assertOk()
-            ->assertSee('Question 1 sur 7')->assertSee('Suivante : ouvrir Q2')->assertSee('Mes notes')->assertSee('Fermer');
+            ->assertSee('Question 1 sur 13')->assertSee('Suivante : ouvrir Q2')->assertSee('Mes notes')->assertSee('Fermer');
 
         // L'animateur voit les resultats meme si la salle ne les voit pas encore.
         $this->actingAs($admin)->getJson("/sondage/{$session->id}/etat")->assertOk()
@@ -159,7 +160,7 @@ class AdminLiveTest extends TestCase
     {
         $admin = $this->admin();
         $session = LiveSession::createFromTemplate('reseaux-sociaux');
-        $choice = $session->questions[2];
+        $choice = $session->questions[1];
         $words = $session->questions[0];
         LiveAnswer::create(['live_question_id' => $choice->id, 'token' => str_repeat('a', 40), 'option_index' => 1]);
         LiveAnswer::create(['live_question_id' => $words->id, 'token' => str_repeat('a', 40), 'value' => 'instagram']);
@@ -168,7 +169,7 @@ class AdminLiveTest extends TestCase
 
         $response->assertOk();
         $csv = $response->streamedContent();
-        $this->assertStringContainsString('Une norme partagée par une époque', $csv);
+        $this->assertStringContainsString('Celui de droite', $csv);
         $this->assertStringContainsString('instagram', $csv);
         $this->assertStringContainsString('Nuage de mots', $csv);
     }

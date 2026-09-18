@@ -36,13 +36,18 @@ class ParticipantLiveTest extends TestCase
         $this->getJson('/live/etat')->assertOk()->assertJson(['session' => null, 'question' => null]);
     }
 
-    public function test_le_modele_reseaux_sociaux_cree_sept_questions(): void
+    public function test_le_modele_reseaux_sociaux_cree_treize_questions(): void
     {
         $session = LiveSession::createFromTemplate('reseaux-sociaux');
 
-        $this->assertCount(7, $session->questions);
-        $this->assertSame(['words', 'text', 'choice', 'choice', 'words', 'text', 'choice'], $session->questions->pluck('type')->all());
-        $this->assertCount(4, $session->questions[3]->options);
+        $this->assertCount(13, $session->questions);
+        $this->assertSame(
+            ['words', 'choice', 'words', 'choice', 'words', 'text', 'choice', 'choice', 'choice', 'choice', 'words', 'text', 'choice'],
+            $session->questions->pluck('type')->all()
+        );
+        $this->assertCount(4, $session->questions[1]->options);
+        $this->assertCount(3, $session->questions[6]->options);
+        $this->assertNotEmpty($session->questions[0]->notes);
     }
 
     public function test_un_participant_repond_une_seule_fois_par_question_et_peut_modifier(): void
