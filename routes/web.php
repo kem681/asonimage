@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AuthorizedEmailController;
+use App\Http\Controllers\Admin\LiveSessionController;
 use App\Http\Controllers\Admin\ResourceController as AdminResourceController;
 use App\Http\Controllers\Admin\WorkshopCodeController;
 use App\Http\Controllers\Admin\WorkshopParticipantController;
@@ -8,6 +9,8 @@ use App\Http\Controllers\Admin\WorkshopStatsController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\InscriptionController;
+use App\Http\Controllers\Live\ParticipantController as LiveParticipantController;
+use App\Http\Controllers\Live\ScreenController as LiveScreenController;
 use App\Http\Controllers\ResourceLibraryController;
 use App\Http\Controllers\Workshop\AnchorController;
 use App\Http\Controllers\Workshop\DashboardController;
@@ -61,6 +64,36 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('/participants/export', [WorkshopParticipantController::class, 'export'])->name('participants.export');
         Route::get('/chiffres', [WorkshopStatsController::class, 'index'])->name('stats');
     });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Sondages en direct (asonimage.ch/live pour la salle, /sondage pour l'animateur)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/live', [LiveParticipantController::class, 'show'])->name('live.show');
+Route::get('/live/etat', [LiveParticipantController::class, 'state'])->name('live.state');
+Route::post('/live/repondre', [LiveParticipantController::class, 'answer'])->name('live.answer');
+Route::get('/live/ecran', [LiveScreenController::class, 'show'])->name('live.screen');
+Route::get('/live/ecran/etat', [LiveScreenController::class, 'state'])->name('live.screen.state');
+
+Route::middleware(['auth', 'admin'])->prefix('sondage')->name('admin.live.')->group(function () {
+    Route::get('/', [LiveSessionController::class, 'index'])->name('index');
+    Route::post('/', [LiveSessionController::class, 'store'])->name('store');
+    Route::get('/{session}', [LiveSessionController::class, 'show'])->name('show');
+    Route::get('/{session}/presenter', [LiveSessionController::class, 'presenter'])->name('presenter');
+    Route::get('/{session}/etat', [LiveSessionController::class, 'state'])->name('state');
+    Route::post('/{session}/activer', [LiveSessionController::class, 'activate'])->name('activate');
+    Route::post('/{session}/attente', [LiveSessionController::class, 'lobby'])->name('lobby');
+    Route::post('/{session}/questions', [LiveSessionController::class, 'storeQuestion'])->name('questions.store');
+    Route::post('/{session}/questions/{question}/ouvrir', [LiveSessionController::class, 'open'])->name('questions.open');
+    Route::post('/{session}/questions/{question}/resultats', [LiveSessionController::class, 'toggleResults'])->name('questions.results');
+    Route::post('/{session}/questions/{question}/fermer', [LiveSessionController::class, 'close'])->name('questions.close');
+    Route::post('/{session}/questions/{question}/effacer', [LiveSessionController::class, 'reset'])->name('questions.reset');
+    Route::delete('/{session}/questions/{question}', [LiveSessionController::class, 'destroyQuestion'])->name('questions.destroy');
+    Route::get('/{session}/export', [LiveSessionController::class, 'export'])->name('export');
+    Route::delete('/{session}', [LiveSessionController::class, 'destroy'])->name('destroy');
 });
 
 /*
