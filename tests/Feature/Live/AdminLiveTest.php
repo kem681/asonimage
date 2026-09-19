@@ -77,7 +77,7 @@ class AdminLiveTest extends TestCase
 
         $this->actingAs($admin)->get("/sondage/{$session->id}")->assertOk()
             ->assertSee('qui fixe les critères de beauté')
-            ->assertSee('Lequel des deux visages est beau')
+            ->assertSee('attirerait probablement le plus de likes')
             ->assertSee('Ma décision pour cette semaine')
             ->assertSee('Mettre en ligne')
             ->assertSee('Fermer')
@@ -99,7 +99,7 @@ class AdminLiveTest extends TestCase
 
         // Ecran d'attente : bouton pour ouvrir Q1 et ses notes.
         $this->actingAs($admin)->get("/sondage/{$session->id}/presenter")->assertOk()
-            ->assertSee('Ouvrir Q1')->assertSee('Personne n\'a écrit');
+            ->assertSee('Ouvrir Q1')->assertSee('Regardez ce qui est gros');
 
         $q1->update(['status' => LiveQuestion::STATUS_OPEN]);
         $session->update(['current_question_id' => $q1->id]);

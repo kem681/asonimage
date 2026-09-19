@@ -42,11 +42,12 @@ class ParticipantLiveTest extends TestCase
 
         $this->assertCount(13, $session->questions);
         $this->assertSame(
-            ['words', 'choice', 'words', 'choice', 'words', 'text', 'choice', 'choice', 'choice', 'choice', 'words', 'text', 'choice'],
+            ['words', 'choice', 'choice', 'words', 'words', 'choice', 'text', 'choice', 'choice', 'words', 'text', 'choice', 'text'],
             $session->questions->pluck('type')->all()
         );
-        $this->assertCount(4, $session->questions[1]->options);
-        $this->assertCount(3, $session->questions[6]->options);
+        $this->assertCount(2, $session->questions[1]->options);
+        $this->assertCount(4, $session->questions[5]->options);
+        $this->assertCount(3, $session->questions[7]->options);
         $this->assertNotEmpty($session->questions[0]->notes);
     }
 
@@ -59,18 +60,18 @@ class ParticipantLiveTest extends TestCase
             ->assertOk()->assertJson(['ok' => true]);
 
         $this->withCookie('live_token', str_repeat('a', 40))
-            ->postJson('/live/repondre', ['question_id' => $question->id, 'option_index' => 2])
+            ->postJson('/live/repondre', ['question_id' => $question->id, 'option_index' => 1])
             ->assertOk();
 
         $this->withCookie('live_token', str_repeat('b', 40))
-            ->postJson('/live/repondre', ['question_id' => $question->id, 'option_index' => 2])
+            ->postJson('/live/repondre', ['question_id' => $question->id, 'option_index' => 1])
             ->assertOk();
 
         $this->assertSame(2, LiveAnswer::count());
-        $this->assertSame(2, LiveAnswer::where('token', str_repeat('a', 40))->value('option_index'));
+        $this->assertSame(1, LiveAnswer::where('token', str_repeat('a', 40))->value('option_index'));
 
         $state = $this->withCookie('live_token', str_repeat('a', 40))->getJson('/live/etat');
-        $state->assertOk()->assertJsonPath('answer.option_index', 2)->assertJsonPath('results', null);
+        $state->assertOk()->assertJsonPath('answer.option_index', 1)->assertJsonPath('results', null);
     }
 
     public function test_un_premier_visiteur_recoit_un_jeton_en_cookie(): void
