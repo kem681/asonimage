@@ -77,7 +77,7 @@ class AdminLiveTest extends TestCase
 
         $this->actingAs($admin)->get("/sondage/{$session->id}")->assertOk()
             ->assertSee('qui fixe les critères de beauté')
-            ->assertSee('attirerait probablement le plus de likes')
+            ->assertSee('standards de beauté actuels')
             ->assertSee('Ma décision pour cette semaine')
             ->assertSee('Mettre en ligne')
             ->assertSee('Fermer')
@@ -169,7 +169,7 @@ class AdminLiveTest extends TestCase
 
         $response->assertOk();
         $csv = $response->streamedContent();
-        $this->assertStringContainsString('Celui de droite', $csv);
+        $this->assertStringContainsString('La photo de droite', $csv);
         $this->assertStringContainsString('instagram', $csv);
         $this->assertStringContainsString('Nuage de mots', $csv);
     }

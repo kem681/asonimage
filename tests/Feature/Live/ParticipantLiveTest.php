@@ -45,7 +45,7 @@ class ParticipantLiveTest extends TestCase
             ['words', 'choice', 'choice', 'words', 'words', 'choice', 'text', 'choice', 'choice', 'words', 'text', 'choice', 'text'],
             $session->questions->pluck('type')->all()
         );
-        $this->assertCount(2, $session->questions[1]->options);
+        $this->assertCount(4, $session->questions[1]->options);
         $this->assertCount(4, $session->questions[5]->options);
         $this->assertCount(3, $session->questions[7]->options);
         $this->assertNotEmpty($session->questions[0]->notes);
